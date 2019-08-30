@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "docsify run angular demo plugin",
   "scripts": {
-    "build": "npm run clean && rollup -c rollup-config.js",
+    "build": "npm run clean && rollup -c rollup.config.js && cp README.md dist",
     "publish": "npm publish dist",
     "clean": "rimraf dist"
   },
@@ -31,6 +31,7 @@
     "rimraf": "2.6.1",
     "rollup": "0.49.2",
     "rollup-plugin-commonjs": "8.2.0",
+    "rollup-plugin-copy": "3.1.0",
     "rollup-plugin-node-resolve": "3.0.0",
     "rollup-plugin-typescript": "1.0.1",
     "rollup-plugin-uglify": "3.0.0",
