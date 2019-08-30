@@ -8,8 +8,8 @@ export default {
     input: './src/docsify-demo-box-angular.ts',
 
     output: {
-        file: './dist/docsify-demo-box-angular.umd.js',
-        format: 'umd',
+        file: './dist/docsify-demo-box-angular.bundle.js',
+        format: 'iife',
         name: 'DemoBoxAngular',
         sourcemap: true
     },

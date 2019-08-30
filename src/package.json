@@ -1,7 +1,7 @@
 {
   "name": "docsify-demo-box-angular",
-  "version": "0.0.1",
-  "main": "docsify-demo-box-angular.umd.js",
+  "version": "0.0.2",
+  "main": "docsify-demo-box-angular.bundle.js",
   "description": "docsify run angular demo plugin",
   "repository": {
     "type": "git",

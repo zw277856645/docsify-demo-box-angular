@@ -7,7 +7,7 @@ docsify 运行 angular demo 的插件
 #### 1.在 index.html 引入脚本
 
 ```html
-<script src="https://unpkg.com/docsify-demo-box-angular@{version}/dist/docsify-demo-box-angular.umd.js"></script>
+<script src="https://unpkg.com/docsify-demo-box-angular@{version}/docsify-demo-box-angular.bundle.js"></script>
 ```
 
 #### 2.在 docsify plugins 中引入插件
