@@ -30,6 +30,15 @@ export function create(config?: DocsifyDemoBoxAngularConfig) {
                         const id = `demo-box-angular-${++count}`;
 
                         Promise.resolve().then(() => {
+                            // 每行以注释开头，文件引入模式
+                            if (/^\/\//m.test(code)) {
+
+                            }
+                            // 源代码模式
+                            else {
+
+                            }
+
                             if (!/class\s+(\w+)\s*{/.exec(code)) {
                                 throw Error('Invalid angular component definition');
                             }
