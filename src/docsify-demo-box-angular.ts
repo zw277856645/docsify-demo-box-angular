@@ -30,6 +30,7 @@ export function create(config?: DocsifyDemoBoxAngularConfig) {
                         const id = `demo-box-angular-${++count}`;
 
                         Promise.resolve().then(() => {
+                            // TODO
                             // 每行以注释开头，文件引入模式
                             if (/^\/\//m.test(code)) {
 
