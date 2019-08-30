@@ -39,14 +39,14 @@ export class ExampleComponent {
 指定为`angular`的代码块将会被解析，并插入一个内嵌 stackblitz 代码预览器
 
 注意所依赖的模块要全部导入(`import`)，如果依赖了插件未包含的npm包，需要在配置的`dependencies`中指定。默认已依赖的包如下：
-`@angular/animations: ^8.1.2`
-`@angular/common: ^8.1.2`
-`@angular/core: ^8.1.2`
-`@angular/router: ^8.1.2`
-`@angular/platform-browser: ^8.1.2`
-`@angular/platform-browser-dynamic: ^8.1.2`
-`rxjs: ^6.5.1`
-`zone.js: ^0.9.1`、`core-js: ^2.5.7`
+- `@angular/animations: ^8.1.2`
+- `@angular/common: ^8.1.2`
+- `@angular/core: ^8.1.2`
+- `@angular/router: ^8.1.2`
+- `@angular/platform-browser: ^8.1.2`
+- `@angular/platform-browser-dynamic: ^8.1.2`
+- `rxjs: ^6.5.1`
+- `zone.js: ^0.9.1`、`core-js: ^2.5.7`
 
 ## 🎨 create 配置
 
