@@ -46,7 +46,8 @@ export class ExampleComponent {
 - `@angular/platform-browser: ^8.1.2`
 - `@angular/platform-browser-dynamic: ^8.1.2`
 - `rxjs: ^6.5.1`
-- `zone.js: ^0.9.1`、`core-js: ^2.5.7`
+- `zone.js: ^0.9.1`
+- `core-js: ^2.5.7`
 
 ## 🎨 create 配置
 
