@@ -23,7 +23,7 @@ window.$docsify = {
 
 #### 3.在文档中写 angular 组件
 
-```ts
+```js
 \`\`\`angular
 import { Component } from '@angular/core';
 
@@ -43,7 +43,7 @@ export class ExampleComponent {
 
 ## 🎨 create 配置
 
-依赖 stackblitz sdk，各参数作用请参见[stackblitz doc](https://stackblitz.com/docs#generate-and-embed-new-projects)
+依赖 stackblitz sdk，各参数作用请参见 [tackblitz DOC](https://stackblitz.com/docs#generate-and-embed-new-projects)
 
 ```js
 {
