@@ -1,0 +1,17 @@
+{
+  "name": "docsify-demo-box-angular",
+  "version": "0.0.1",
+  "main": "docsify-demo-box-angular.umd.js",
+  "description": "docsify run angular demo plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/zw277856645/docsify-demo-box-angular.git"
+  },
+  "keywords": [
+    "angular",
+    "docsify",
+    "demo"
+  ],
+  "author": "wei.zhang",
+  "license": "MIT"
+}
