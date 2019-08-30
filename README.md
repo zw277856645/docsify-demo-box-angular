@@ -2,7 +2,7 @@
 
 docsify 运行 angular demo 的插件
 
-## 使用
+## 🔨 使用
 
 #### 1.在 index.html 引入脚本
 
@@ -41,11 +41,13 @@ export class ExampleComponent {
 `@angular/platform-browser: ^8.1.2`、`@angular/platform-browser-dynamic: ^8.1.2`、`rxjs: ^6.5.1`、
 `zone.js: ^0.9.1`、`core-js: ^2.5.7`
 
-## create 配置
+## 🎨 create 配置
+
+依赖 stackblitz sdk，各参数作用请参见[stackblitz doc](https://stackblitz.com/docs#generate-and-embed-new-projects)
 
 ```js
 {
-    // 项目配置，各参数作用请参见[stackblitz doc](https://stackblitz.com/docs#generate-and-embed-new-projects)
+    // 项目配置
     project?: {
         files?: { [path: string]: string };  // 定义额外的文件，通常不需要
         title?: string;
