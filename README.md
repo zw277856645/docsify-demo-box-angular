@@ -4,7 +4,7 @@ docsify 运行 angular demo 的插件
 
 ## 使用
 
-#### 1.引入脚本
+#### 1.在 index.html 引入脚本
 
 ```html
 <script src="https://unpkg.com/docsify-demo-box-angular@{version}/dist/docsify-demo-box-angular.umd.js"></script>
@@ -24,7 +24,7 @@ window.$docsify = {
 #### 3.在文档中写 angular 组件
 
 ```ts
-```angular
+\`\`\`angular
 import { Component } from '@angular/core';
 
 @Component({
@@ -33,13 +33,13 @@ import { Component } from '@angular/core';
 export class ExampleComponent {
     name = 'man'
 }
-```
+\`\`\`
 ```
 
-> 注意所依赖的模块要全部导入(`import`)，如果依赖了插件未包含的npm包，需要在配置的`dependencies`中指定。默认已依赖的包如下：
-> `@angular/animations: ^8.1.2`、`@angular/common: ^8.1.2`、`@angular/core: ^8.1.2`、`@angular/router: ^8.1.2`、
-> `@angular/platform-browser: ^8.1.2`、`@angular/platform-browser-dynamic: ^8.1.2`、`rxjs: ^6.5.1`、
-> `zone.js: ^0.9.1`、`core-js: ^2.5.7`
+注意所依赖的模块要全部导入(`import`)，如果依赖了插件未包含的npm包，需要在配置的`dependencies`中指定。默认已依赖的包如下：
+`@angular/animations: ^8.1.2`、`@angular/common: ^8.1.2`、`@angular/core: ^8.1.2`、`@angular/router: ^8.1.2`、
+`@angular/platform-browser: ^8.1.2`、`@angular/platform-browser-dynamic: ^8.1.2`、`rxjs: ^6.5.1`、
+`zone.js: ^0.9.1`、`core-js: ^2.5.7`
 
 ## create 配置
 
