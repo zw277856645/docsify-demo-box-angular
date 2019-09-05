@@ -81,7 +81,7 @@ function dealSourceCodeMode(id: string, code: string, config: DocsifyDemoBoxAngu
         }
 
         const className = RegExp.$1;
-        const fileName = parseClassName2FileName(className);
+        const fileName = './' + parseClassName2FileName(className);
 
         sdk.embedProject(
             id,

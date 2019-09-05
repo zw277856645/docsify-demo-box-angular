@@ -16,7 +16,7 @@ export class BounceDropComponent {
 
 ``` angular-files
 files/main.component.ts
-files/main.component.less
+files/main.component.css
 ./files/main.component.html
 ```
 
