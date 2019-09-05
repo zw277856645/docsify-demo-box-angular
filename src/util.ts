@@ -35,7 +35,7 @@ export function createPolyfills() {
     `;
 }
 
-export function createAppModuleTs(className: string, fileName: string) {
+export function createAppModuleTs(files: FileInfo[]) {
     return `
         import { NgModule } from '@angular/core';
         import { CommonModule } from '@angular/common';
@@ -43,7 +43,7 @@ export function createAppModuleTs(className: string, fileName: string) {
         import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         import { AppRouterModule } from './app-router.module';
         import { AppComponent } from './app.component';
-        import { ${className} } from './${fileName}';
+        ${files.map(file => `import { ${file.className} } from '${file.fileName}';`).join('')}
         
         @NgModule({
             imports: [
@@ -54,7 +54,7 @@ export function createAppModuleTs(className: string, fileName: string) {
             ],
             declarations: [ 
                 AppComponent,
-                ${className}
+                ${files.map(file => file.className).join(',')}
             ],
             bootstrap: [ AppComponent ]
         })
@@ -63,16 +63,16 @@ export function createAppModuleTs(className: string, fileName: string) {
     `;
 }
 
-export function createAppRouterModuleTs(className: string, fileName: string) {
+export function createAppRouterModuleTs(mainFile: FileInfo) {
     return `
         import { RouterModule, Routes } from '@angular/router';
         import { NgModule } from '@angular/core';
-        import { ${className} } from './${fileName}';
+        import { ${mainFile.className} } from '${mainFile.fileName}';
         
         const routes: Routes = [
             {
                 path: '',
-                component: ${className}
+                component: ${mainFile.className}
             }
         ];
         
@@ -100,4 +100,50 @@ export function createAppComponentTs() {
 
 export function parseClassName2FileName(className: string) {
     return className.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/(^-)|(-$)/, '');
+}
+
+export class FileInfo {
+
+    className?: string;
+
+    fileName: string;
+
+    type: FileType;
+
+    ext: string;
+
+    code: string;
+
+    mainComponent?: boolean;
+}
+
+export enum FileType {
+    COMPONENT = 'COMPONENT', DIRECTIVE = 'DIRECTIVE', PIPE = 'PIPE', OTHER = 'OTHER'
+}
+
+export function createDefaultFiles(fileInfos: FileInfo[]) {
+    if (!fileInfos || !fileInfos.length) {
+        return {};
+    }
+
+    // 需要在 module 中声明的文件
+    let needDeclareFiles = fileInfos.filter(file => {
+        return [ FileType.COMPONENT, FileType.DIRECTIVE, FileType.PIPE ].indexOf(file.type) >= 0;
+    });
+
+    // 主组件
+    let mainComponent = needDeclareFiles.find(file => file.mainComponent);
+
+    let files = {
+        'index.html': createIndexHtml(),
+        'main.ts': createMainTs(),
+        'polyfills.ts': createPolyfills(),
+        'app.component.ts': createAppComponentTs(),
+        'app.module.ts': createAppModuleTs(needDeclareFiles),
+        'app-router.module.ts': createAppRouterModuleTs(mainComponent)
+    };
+
+    fileInfos.forEach(file => files[ file.fileName + file.ext ] = file.code);
+
+    return files;
 }

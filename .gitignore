@@ -18,3 +18,6 @@ node_modules
 .npm
 
 .idea
+
+demo/docsify-demo-box-angular.bundle.js
+demo/docsify-demo-box-angular.bundle.js.map
