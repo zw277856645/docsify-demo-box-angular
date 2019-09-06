@@ -13,6 +13,10 @@
   "devDependencies": {
     "@angular/compiler": "8.1.2",
     "@angular/compiler-cli": "8.1.2",
+    "@angular/platform-browser": "8.1.2",
+    "@angular/platform-browser-dynamic": "8.1.2",
+    "@angular/common": "8.1.2",
+    "@angular/router": "8.1.2",
     "@angular/core": "8.1.2",
     "@types/jquery": "3.3.31",
     "@types/node": "10.14.5",

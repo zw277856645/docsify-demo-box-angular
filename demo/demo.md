@@ -12,11 +12,25 @@ export class BounceDropComponent {
 }
 ```
 
-## 文件引入模式
+## 部分文件引入模式
 
 ``` angular-files
+files/util.ts
 files/main.component.ts
-files/main.component.css
-./files/main.component.html
+files/style.component.ts
+```
+
+## 全量文件引入方式
+
+``` angular-all-files
+all-files/app.component.ts
+all-files/app.module.ts
+all-files/app-router.module.ts
+all-files/main.ts
+all-files/polyfills.ts
+all-files/index.html
+all-files/main.component.ts
+
+files/style.component.ts
 ```
 

@@ -1,4 +1,6 @@
-export function createIndexHtml() {
+/* 内部使用 */
+
+function createIndexHtml() {
     return `
         <!DOCTYPE html>
         <html>
@@ -18,7 +20,7 @@ export function createIndexHtml() {
     `;
 }
 
-export function createMainTs() {
+function createMainTs() {
     return `
         import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
         import { AppModule } from './app.module';
@@ -27,7 +29,7 @@ export function createMainTs() {
     `;
 }
 
-export function createPolyfills() {
+function createPolyfills() {
     return `
         import 'core-js/es6/reflect';
         import 'core-js/es7/reflect';
@@ -35,7 +37,7 @@ export function createPolyfills() {
     `;
 }
 
-export function createAppModuleTs(files: FileInfo[]) {
+function createAppModuleTs(files: FileInfo[]) {
     return `
         import { NgModule } from '@angular/core';
         import { CommonModule } from '@angular/common';
@@ -63,7 +65,7 @@ export function createAppModuleTs(files: FileInfo[]) {
     `;
 }
 
-export function createAppRouterModuleTs(mainFile: FileInfo) {
+function createAppRouterModuleTs(mainFile: FileInfo) {
     return `
         import { RouterModule, Routes } from '@angular/router';
         import { NgModule } from '@angular/core';
@@ -85,7 +87,7 @@ export function createAppRouterModuleTs(mainFile: FileInfo) {
     `;
 }
 
-export function createAppComponentTs() {
+function createAppComponentTs() {
     return `
         import { Component } from '@angular/core';
         
@@ -98,8 +100,10 @@ export function createAppComponentTs() {
     `;
 }
 
+/* 外部使用 */
+
 export function parseClassName2FileName(className: string) {
-    return className.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/(^-)|(-$)/, '');
+    return className.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/(^-)|(-$)/g, '');
 }
 
 export class FileInfo {
@@ -146,4 +150,94 @@ export function createDefaultFiles(fileInfos: FileInfo[]) {
     fileInfos.forEach(file => files[ file.fileName + file.ext ] = file.code);
 
     return files;
+}
+
+export function createAllFiles(fileInfos: FileInfo[]) {
+    // 找到 index.html，以其为根路径，移动所有文件
+    let index = fileInfos.find(file => /index\.html$/i.test(file.fileName + file.ext));
+
+    if (!index) {
+        throw Error('No index.html provided');
+    }
+
+    let basePath = /^(.+)index$/i.exec(index.fileName) && RegExp.$1 !== './' ? RegExp.$1 : null;
+
+    return fileInfos.reduce((prev, file) => {
+        if (basePath && file.className.startsWith(basePath)) {
+            // code 中引用 index.html 目录外部的文件，修改相对路径 TODO
+
+            prev[ file.fileName.replace(basePath, './') + file.ext ] = file.code;
+        } else {
+            prev[ file.fileName + file.ext ] = file.code;
+        }
+
+        return prev;
+    }, {});
+}
+
+export const COMPONENT_CLASS_REG = /@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
+export const DIRECTIVE_CLASS_REG = /@Directive\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
+export const PIPE_CLASS_REG = /@Pipe\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
+
+export function createFileInfo(content: string, path: string) {
+    let info = new FileInfo();
+    info.code = content;
+
+    let filePath = path.trim();
+    if (!filePath.startsWith('./')) {
+        filePath = './' + filePath;
+    }
+
+    info.fileName = filePath.substring(0, filePath.lastIndexOf('.'));
+    info.ext = filePath.substring(filePath.lastIndexOf('.'));
+
+    if (/^.ts$/i.test(info.ext)) {
+        if (COMPONENT_CLASS_REG.exec(content)) {
+            info.className = RegExp.$1;
+            info.type = FileType.COMPONENT;
+        } else if (DIRECTIVE_CLASS_REG.exec(content)) {
+            info.className = RegExp.$1;
+            info.type = FileType.DIRECTIVE;
+        } else if (PIPE_CLASS_REG.exec(content)) {
+            info.className = RegExp.$1;
+            info.type = FileType.PIPE;
+        } else {
+            info.type = FileType.OTHER;
+        }
+    } else {
+        info.type = FileType.OTHER;
+    }
+
+    return info;
+}
+
+export function getComponentUrlFiles(fileInfos: FileInfo[]) {
+    return fileInfos.reduce((prev, fileInfo) => {
+        if (fileInfo.type === FileType.COMPONENT) {
+            let [ annotation ] = fileInfo.code.match(/@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)/g);
+            let files: string[] = [];
+
+            if (/templateUrl\s*:\s*['"](.+?)['"]/.exec(annotation)) {
+                files.push(RegExp.$1);
+            }
+
+            if (/styleUrls\s*:\s*\[((.|\n)+?)\]/.exec(annotation)) {
+                files.push(
+                    ...RegExp.$1.split(',').map(v => v.trim().replace(/(^['"])|(['"]$)/g, '')).filter(v => v)
+                );
+            }
+
+            if (files.length) {
+                if (fileInfo.fileName.includes('/')) {
+                    let basePath = fileInfo.fileName.substring(0, fileInfo.fileName.lastIndexOf('/') + 1);
+
+                    return prev.concat(files.map(file => basePath + file.replace(/^\.\//, '')));
+                } else {
+                    return prev.concat(files);
+                }
+            }
+        }
+
+        return prev;
+    }, []);
 }

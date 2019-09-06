@@ -2,7 +2,10 @@ import { deepExtend } from 'cmjs-lib';
 import sdk from '@stackblitz/sdk';
 import * as $ from 'jquery';
 import { EmbedOptions, Project } from '@stackblitz/sdk/typings/interfaces';
-import { createDefaultFiles, FileInfo, FileType, parseClassName2FileName } from './util';
+import {
+    COMPONENT_CLASS_REG, createAllFiles, createDefaultFiles, createFileInfo, FileType, getComponentUrlFiles,
+    parseClassName2FileName
+} from './util';
 
 export interface DocsifyDemoBoxAngularConfig {
 
@@ -11,9 +14,7 @@ export interface DocsifyDemoBoxAngularConfig {
     embedOptions?: Partial<EmbedOptions>;
 }
 
-const COMPONENT_CLASS_REG = /@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
-const DIRECTIVE_CLASS_REG = /@Directive\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
-const PIPE_CLASS_REG = /@Pipe\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
+const FILE_MODE_REG = /^(?<!\/\/|\/\*|\/\*\*)\s*((\.\/)?[\w$][\w$-/.]+)/mg;
 
 const defaultDependencies = {
     '@angular/animations': '^8.1.2',
@@ -33,7 +34,7 @@ const defaultEmbedConfig = {
     view: 'preview',
     hideExplorer: true,
     hideNavigation: true,
-    forceEmbedLayout: true,
+    forceEmbedLayout: true
 };
 
 export function create(config?: DocsifyDemoBoxAngularConfig) {
@@ -57,9 +58,9 @@ export function create(config?: DocsifyDemoBoxAngularConfig) {
                     } else if (/^angular-files$/i.test(lang)) {
                         // 部分文件引入方式
                         return dealPartFilesMode(id, code, config);
-                    } else if (/^angular-files-full$/i.test(lang)) {
+                    } else if (/^angular-all-files$/i.test(lang)) {
                         // 全量文件引入方式
-                        return dealFullFilesMode();
+                        return dealAllFilesMode(id, code, config);
                     } else {
                         // 原始解析器
                         if (codeFn) {
@@ -119,7 +120,7 @@ function dealSourceCodeMode(id: string, code: string, config: DocsifyDemoBoxAngu
 }
 
 function dealPartFilesMode(id: string, code: string, config: DocsifyDemoBoxAngularConfig) {
-    let files = code.match(/^(?<!\/\/|\/\*|\/\*\*)\s*((\.\/)?[\w$][\w$/.]+)/mg);
+    let files = code.match(FILE_MODE_REG);
     if (!files) {
         throw Error('No files provided');
     }
@@ -128,41 +129,9 @@ function dealPartFilesMode(id: string, code: string, config: DocsifyDemoBoxAngul
     Promise.all(
         files.map(file => $.get(file.trim()).catch(() => null))
     ).then(fileContents => {
-        let fileInfos = fileContents.map((content, i) => {
-            if (content) {
-                let info = new FileInfo();
-                info.code = content;
-
-                let filePath = files[ i ].trim();
-                if (!filePath.startsWith('./')) {
-                    filePath = './' + filePath;
-                }
-
-                info.fileName = filePath.substring(0, filePath.lastIndexOf('.'));
-                info.ext = filePath.substring(filePath.lastIndexOf('.'));
-
-                if (/^.ts$/i.test(info.ext)) {
-                    if (COMPONENT_CLASS_REG.exec(content)) {
-                        info.className = RegExp.$1;
-                        info.type = FileType.COMPONENT;
-                    } else if (DIRECTIVE_CLASS_REG.exec(content)) {
-                        info.className = RegExp.$1;
-                        info.type = FileType.DIRECTIVE;
-                    } else if (PIPE_CLASS_REG.exec(content)) {
-                        info.className = RegExp.$1;
-                        info.type = FileType.PIPE;
-                    } else {
-                        info.type = FileType.OTHER;
-                    }
-                } else {
-                    info.type = FileType.OTHER;
-                }
-
-                return info;
-            }
-
-            return null;
-        });
+        let fileInfos = fileContents
+            .map((content, i) => content ? createFileInfo(content, files[ i ]) : null)
+            .filter(v => v);
 
         // 设置第一个 component 为主组件
         let mainComponent = fileInfos.find(file => file.type === FileType.COMPONENT);
@@ -173,34 +142,88 @@ function dealPartFilesMode(id: string, code: string, config: DocsifyDemoBoxAngul
 
         mainComponent.mainComponent = true;
 
-        sdk.embedProject(
-            id,
-            deepExtend(
-                {
-                    files: createDefaultFiles(fileInfos.filter(v => v)),
-                    template: 'angular-cli',
-                    dependencies: defaultDependencies,
-                    settings: {
-                        compile: {
-                            clearConsole: false
+        // 获取 component 中 templateUrl、styleUrls文件
+        let extraFiles = getComponentUrlFiles(fileInfos);
+
+        Promise.all(
+            extraFiles.map(file => $.get(file.trim()).catch(() => null))
+        ).then(extraFileContents => {
+            let extraFileInfos = extraFileContents
+                .map((content, i) => content ? createFileInfo(content, extraFiles[ i ]) : null)
+                .filter(v => v);
+
+            sdk.embedProject(
+                id,
+                deepExtend(
+                    {
+                        files: createDefaultFiles(fileInfos.concat(extraFileInfos)),
+                        template: 'angular-cli',
+                        dependencies: defaultDependencies,
+                        settings: {
+                            compile: {
+                                clearConsole: false
+                            }
                         }
-                    }
-                },
-                config && config.project
-            ),
-            deepExtend(
-                {
-                    ...defaultEmbedConfig,
-                    openFile: mainComponent.fileName + mainComponent.ext
-                },
-                config && config.embedOptions
-            )
-        );
+                    },
+                    config && config.project
+                ),
+                deepExtend(
+                    {
+                        ...defaultEmbedConfig,
+                        openFile: mainComponent.fileName + mainComponent.ext
+                    },
+                    config && config.embedOptions
+                )
+            );
+        });
     });
 
     return `<div id="${id}"></div>`;
 }
 
-function dealFullFilesMode() {
+function dealAllFilesMode(id: string, code: string, config: DocsifyDemoBoxAngularConfig) {
+    let files = code.match(FILE_MODE_REG);
+    if (!files) {
+        throw Error('No files provided');
+    }
 
+    // ajax 读取服务器下的本地文件
+    Promise.all(
+        files.map(file => $.get(file.trim()).catch(() => null))
+    ).then(fileContents => {
+        let fileInfos = fileContents
+            .map((content, i) => content ? createFileInfo(content, files[ i ]) : null)
+            .filter(v => v);
+
+        // 获取 component 中 templateUrl、styleUrls文件
+        let extraFiles = getComponentUrlFiles(fileInfos);
+
+        Promise.all(
+            extraFiles.map(file => $.get(file.trim()).catch(() => null))
+        ).then(extraFileContents => {
+            let extraFileInfos = extraFileContents
+                .map((content, i) => content ? createFileInfo(content, extraFiles[ i ]) : null)
+                .filter(v => v);
+
+            sdk.embedProject(
+                id,
+                deepExtend(
+                    {
+                        files: createAllFiles(fileInfos.concat(extraFileInfos)),
+                        template: 'angular-cli',
+                        dependencies: defaultDependencies,
+                        settings: {
+                            compile: {
+                                clearConsole: false
+                            }
+                        }
+                    },
+                    config && config.project
+                ),
+                deepExtend(defaultEmbedConfig, config && config.embedOptions)
+            );
+        });
+    });
+
+    return `<div id="${id}"></div>`;
 }

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { getName } from './util';
 
 @Component({
     templateUrl: './main.component.html',
@@ -7,5 +6,5 @@ import { getName } from './util';
 })
 export class MainComponent {
 
-    name = getName();
+    name = 'lalala';
 }
