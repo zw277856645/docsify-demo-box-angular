@@ -1,6 +1,4 @@
-/* 内部使用 */
-
-function createIndexHtml() {
+export function createIndexHtml() {
     return `
         <!DOCTYPE html>
         <html>
@@ -20,7 +18,7 @@ function createIndexHtml() {
     `;
 }
 
-function createMainTs() {
+export function createMainTs() {
     return `
         import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
         import { AppModule } from './app.module';
@@ -29,7 +27,7 @@ function createMainTs() {
     `;
 }
 
-function createPolyfills() {
+export function createPolyfills() {
     return `
         import 'core-js/es6/reflect';
         import 'core-js/es7/reflect';
@@ -37,35 +35,20 @@ function createPolyfills() {
     `;
 }
 
-function createAppModuleTs(files: FileInfo[]) {
+export function createAppComponentTs() {
     return `
-        import { NgModule } from '@angular/core';
-        import { CommonModule } from '@angular/common';
-        import { BrowserModule } from '@angular/platform-browser';
-        import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-        import { AppRouterModule } from './app-router.module';
-        import { AppComponent } from './app.component';
-        ${files.map(file => `import { ${file.className} } from '${file.fileName}';`).join('')}
+        import { Component } from '@angular/core';
         
-        @NgModule({
-            imports: [
-                CommonModule,
-                BrowserModule,
-                BrowserAnimationsModule,
-                AppRouterModule
-            ],
-            declarations: [ 
-                AppComponent,
-                ${files.map(file => file.className).join(',')}
-            ],
-            bootstrap: [ AppComponent ]
+        @Component({
+            selector: 'my-app',
+            template: '<router-outlet></router-outlet>'
         })
-        export class AppModule {
+        export class AppComponent {
         }
     `;
 }
 
-function createAppRouterModuleTs(mainFile: FileInfo) {
+export function createAppRouterModuleTs(mainFile: FileInfo) {
     return `
         import { RouterModule, Routes } from '@angular/router';
         import { NgModule } from '@angular/core';
@@ -86,21 +69,6 @@ function createAppRouterModuleTs(mainFile: FileInfo) {
         }
     `;
 }
-
-function createAppComponentTs() {
-    return `
-        import { Component } from '@angular/core';
-        
-        @Component({
-            selector: 'my-app',
-            template: '<router-outlet></router-outlet>'
-        })
-        export class AppComponent {
-        }
-    `;
-}
-
-/* 外部使用 */
 
 export function ajaxGet(url: string) {
     return new Promise((resolve, reject) => {
@@ -125,10 +93,6 @@ export function ajaxGet(url: string) {
     });
 }
 
-export function parseClassName2FileName(className: string) {
-    return className.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/(^-)|(-$)/g, '');
-}
-
 export class FileInfo {
 
     className?: string;
@@ -148,59 +112,32 @@ export enum FileType {
     COMPONENT = 'COMPONENT', DIRECTIVE = 'DIRECTIVE', PIPE = 'PIPE', OTHER = 'OTHER'
 }
 
-export function createDefaultFiles(fileInfos: FileInfo[]) {
-    if (!fileInfos || !fileInfos.length) {
-        return {};
-    }
+export const COMPONENT_CLASS_REG = /@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
+export const DIRECTIVE_CLASS_REG = /@Directive\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
+export const PIPE_CLASS_REG = /@Pipe\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
 
-    // 需要在 module 中声明的文件
-    let needDeclareFiles = fileInfos.filter(file => {
-        return [ FileType.COMPONENT, FileType.DIRECTIVE, FileType.PIPE ].indexOf(file.type) >= 0;
-    });
+export const FILE_MODE_REG = /^(?<!\/\/|\/\*|\/\*\*)\s*((\.\/)?[\w$][\w$-/.]+)/mg;
 
-    // 主组件
-    let mainComponent = needDeclareFiles.find(file => file.mainComponent);
+export const DEFAULT_DEPENDENCIES = {
+    '@angular/animations': '^8.1.2',
+    '@angular/common': '^8.1.2',
+    '@angular/core': '^8.1.2',
+    '@angular/router': '^8.1.2',
+    '@angular/platform-browser': '^8.1.2',
+    '@angular/platform-browser-dynamic': '^8.1.2',
+    'rxjs': '^6.5.1',
+    'zone.js': '^0.9.1',
+    'core-js': '^2.5.7'
+};
 
-    let files = {
-        'index.html': createIndexHtml(),
-        'main.ts': createMainTs(),
-        'polyfills.ts': createPolyfills(),
-        'app.component.ts': createAppComponentTs(),
-        'app.module.ts': createAppModuleTs(needDeclareFiles),
-        'app-router.module.ts': createAppRouterModuleTs(mainComponent)
-    };
-
-    fileInfos.forEach(file => files[ file.fileName + file.ext ] = file.code);
-
-    return files;
-}
-
-export function createAllFiles(fileInfos: FileInfo[]) {
-    // 找到 index.html，以其为根路径，移动所有文件
-    let index = fileInfos.find(file => /index\.html$/i.test(file.fileName + file.ext));
-
-    if (!index) {
-        throw Error('No index.html provided');
-    }
-
-    let basePath = /^(.+)index$/i.exec(index.fileName) && RegExp.$1 !== './' ? RegExp.$1 : null;
-
-    return fileInfos.reduce((prev, file) => {
-        if (basePath && file.fileName.startsWith(basePath)) {
-            prev[ file.fileName.replace(basePath, './') + file.ext ] = file.code;
-        } else {
-            // tslint:disable-next-line:no-console
-            console.error(file.fileName + '：External files are not supported. '
-                + 'Move external files to the directory where index.html is located');
-        }
-
-        return prev;
-    }, {});
-}
-
-export const COMPONENT_CLASS_REG = /@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
-export const DIRECTIVE_CLASS_REG = /@Directive\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
-export const PIPE_CLASS_REG = /@Pipe\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*{/;
+export const DEFAULT_EMBED_CONFIG = {
+    height: 400,
+    width: '100%',
+    view: 'preview',
+    hideExplorer: true,
+    hideNavigation: true,
+    forceEmbedLayout: true
+};
 
 export function createFileInfo(content: string, path: string) {
     let info = new FileInfo();
@@ -263,4 +200,28 @@ export function getComponentUrlFiles(fileInfos: FileInfo[]) {
 
         return prev;
     }, []);
+}
+
+export function parseConfig(originCode: string): { config: any, code: string } {
+    // 只识别开头的配置
+    if (/^\s*\{/.test(originCode)) {
+        let splits = originCode.split('\n');
+        let configStr = '', config, code;
+
+        for (let i = 0, len = splits.length; i < len; i++) {
+            configStr += splits[ i ];
+
+            try {
+                config = JSON.stringify(configStr);
+                splits.splice(0, i + 1);
+                code = splits.join('\n');
+                break;
+            } catch (e) {
+            }
+        }
+
+        return { config, code };
+    } else {
+        return { config: null, code: originCode };
+    }
 }

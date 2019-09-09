@@ -1,14 +1,44 @@
 ## 源代码模式
 
 ``` angular
+{
+  "project": {
+    "dependencies": {
+      "ngx-list-filter": "0.0.11"
+    }
+  }
+}
+
+/* DemoComponent */
+
 import { Component } from '@angular/core';
 
 @Component({
-    template: `<h2>Hello，{{name}}</h2>`,
-    styleUrls: [ 'style.css' ]
+    template: `
+        <h2>Hello，<span [innerHTML]="name | color:'red'"></span></h2>
+        <div>[{age:1,age:2,age:3}] | listFilter:{age:{$gte:2}} | json</div>
+    `
 })
-export class BounceDropComponent {
+export class DemoComponent {
     name = 'xxx';
+}
+
+/* ColorPipe */
+
+import { Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+
+@Pipe({
+    name: 'color'
+})
+export class ColorPipe implements PipeTransform {
+
+    constructor(private sanitizer: DomSanitizer) {
+    }
+
+    transform(value: string, color: string) {
+        return this.sanitizer.bypassSecurityTrustHtml(`<span style="color:${color}">${value}</span>`);
+    }
 }
 ```
 
