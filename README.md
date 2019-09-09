@@ -24,11 +24,13 @@ window.$docsify = {
 DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
 [Stackblitz DOC](https://stackblitz.com/docs#generate-and-embed-new-projects)
 
+> 注意此处是全局配置，对所有 demo 解析产生影响，如果需要针对某个demo 解析配置参数，请参考示例章节的`局部配置`
+
 ```js
 {
     // 项目配置
     project?: {
-        files?: { [path: string]: string };  // 定义额外的文件
+        files?: { [path: string]: string };  // 定义额外的文件，全局配置通常不需要设置
         title?: string;
         description?: string;
         template?: 'angular-cli' | 'create-react-app' | 'typescript' | 'javascript';  // 默认 angular-cli，请勿修改
@@ -71,28 +73,35 @@ DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
 #### 3.定义 angular 解析器
 
 提供了3种方式：
-- angular
+- angular  
 源码模式，在文档中直接定义组件源码，适合简单/代码量小的组件使用。相关 angular 运行必备的环境文件由插件内置
 
-- angular-files
+- angular-files  
 部分文件引入模式，在文档中指定组件的路径，适合复杂/代码量大的组件使用。相关 angular 运行必备的环境文件由插件内置
 
-- angular-all-files
+- angular-all-files  
 全量文件引入方式，在文档中指定组件的路径，适合复杂/代码量大的组件使用。不提供任何内置文件，所有文件自定义，注意 index.html、main.ts 为
 必须指定的文件
+
+## 🎨 示例
+
+#### 1.源码模式
 
 ```js
 \`\`\`angular
 import { Component } from '@angular/core';
 
 @Component({
-    template: '<div>Hello {{ name }}</div>'
+    template: '<div>Hello {{ name }}</div>',
+    styles: []
 })
 export class ExampleComponent {
     name = 'man'
 }
 \`\`\`
 ```
+
+解析到的组件会被设定为 DemoBoxAngular.create embedOptions 配置中的`openFile`。注意只能定义单个`@Component`，不支持`@Directive`、`@Pipe`
 
 
 
