@@ -5,7 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRouterModule } from './app-router.module';
 import { AppComponent } from './app.component';
 import { MainComponent } from './main.component';
-import { StyleComponent } from '../files/style.component';
+import { StyleComponent } from './external/style.component';
 
 @NgModule({
     imports: [

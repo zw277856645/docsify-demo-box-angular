@@ -21,43 +21,14 @@ window.$docsify = {
 }
 ```
 
-#### 3.在文档中写 angular 组件
-
-```js
-\`\`\`angular
-import { Component } from '@angular/core';
-
-@Component({
-    template: '<div>Hello {{ name }}</div>'
-})
-export class ExampleComponent {
-    name = 'man'
-}
-\`\`\`
-```
-
-指定为`angular`的代码块将会被解析，并插入一个内嵌 stackblitz 代码预览器
-
-注意所依赖的模块要全部导入(`import`)，如果依赖了插件未包含的npm包，需要在配置的`dependencies`中指定。默认已依赖的包如下：
-- @angular/animations: ^8.1.2
-- @angular/common: ^8.1.2
-- @angular/core: ^8.1.2
-- @angular/router: ^8.1.2
-- @angular/platform-browser: ^8.1.2
-- @angular/platform-browser-dynamic: ^8.1.2
-- rxjs: ^6.5.1
-- zone.js: ^0.9.1
-- core-js: ^2.5.7
-
-## 🎨 create 配置
-
-依赖 stackblitz sdk，各参数作用请参见 [Stackblitz DOC](https://stackblitz.com/docs#generate-and-embed-new-projects)
+DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
+[Stackblitz DOC](https://stackblitz.com/docs#generate-and-embed-new-projects)
 
 ```js
 {
     // 项目配置
     project?: {
-        files?: { [path: string]: string };  // 定义额外的文件，通常不需要
+        files?: { [path: string]: string };  // 定义额外的文件
         title?: string;
         description?: string;
         template?: 'angular-cli' | 'create-react-app' | 'typescript' | 'javascript';  // 默认 angular-cli，请勿修改
@@ -85,3 +56,43 @@ export class ExampleComponent {
     }
 }
 ```
+
+如果依赖了插件未包含的npm包，需要在配置的`dependencies`中指定。默认已依赖的包如下：
+- @angular/animations: ^8.1.2
+- @angular/common: ^8.1.2
+- @angular/core: ^8.1.2
+- @angular/router: ^8.1.2
+- @angular/platform-browser: ^8.1.2
+- @angular/platform-browser-dynamic: ^8.1.2
+- rxjs: ^6.5.1
+- zone.js: ^0.9.1
+- core-js: ^2.5.7
+
+#### 3.定义 angular 解析器
+
+提供了3种方式：
+- angular
+源码模式，在文档中直接定义组件源码，适合简单/代码量小的组件使用。相关 angular 运行必备的环境文件由插件内置
+
+- angular-files
+部分文件引入模式，在文档中指定组件的路径，适合复杂/代码量大的组件使用。相关 angular 运行必备的环境文件由插件内置
+
+- angular-all-files
+全量文件引入方式，在文档中指定组件的路径，适合复杂/代码量大的组件使用。不提供任何内置文件，所有文件自定义，注意 index.html、main.ts 为
+必须指定的文件
+
+```js
+\`\`\`angular
+import { Component } from '@angular/core';
+
+@Component({
+    template: '<div>Hello {{ name }}</div>'
+})
+export class ExampleComponent {
+    name = 'man'
+}
+\`\`\`
+```
+
+
+

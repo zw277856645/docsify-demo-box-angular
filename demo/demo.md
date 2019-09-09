@@ -30,7 +30,6 @@ all-files/main.ts
 all-files/polyfills.ts
 all-files/index.html
 all-files/main.component.ts
-
-files/style.component.ts
+all-files/external/style.component.ts
 ```
 

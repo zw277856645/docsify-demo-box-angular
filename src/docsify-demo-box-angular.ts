@@ -1,8 +1,8 @@
 import { deepExtend } from 'cmjs-lib';
 import sdk from '@stackblitz/sdk';
-import * as $ from 'jquery';
 import { EmbedOptions, Project } from '@stackblitz/sdk/typings/interfaces';
 import {
+    ajaxGet,
     COMPONENT_CLASS_REG, createAllFiles, createDefaultFiles, createFileInfo, FileType, getComponentUrlFiles,
     parseClassName2FileName
 } from './util';
@@ -127,7 +127,7 @@ function dealPartFilesMode(id: string, code: string, config: DocsifyDemoBoxAngul
 
     // ajax 读取服务器下的本地文件
     Promise.all(
-        files.map(file => $.get(file.trim()).catch(() => null))
+        files.map(file => ajaxGet(file.trim()).catch(() => null))
     ).then(fileContents => {
         let fileInfos = fileContents
             .map((content, i) => content ? createFileInfo(content, files[ i ]) : null)
@@ -146,7 +146,7 @@ function dealPartFilesMode(id: string, code: string, config: DocsifyDemoBoxAngul
         let extraFiles = getComponentUrlFiles(fileInfos);
 
         Promise.all(
-            extraFiles.map(file => $.get(file.trim()).catch(() => null))
+            extraFiles.map(file => ajaxGet(file.trim()).catch(() => null))
         ).then(extraFileContents => {
             let extraFileInfos = extraFileContents
                 .map((content, i) => content ? createFileInfo(content, extraFiles[ i ]) : null)
@@ -189,7 +189,7 @@ function dealAllFilesMode(id: string, code: string, config: DocsifyDemoBoxAngula
 
     // ajax 读取服务器下的本地文件
     Promise.all(
-        files.map(file => $.get(file.trim()).catch(() => null))
+        files.map(file => ajaxGet(file.trim()).catch(() => null))
     ).then(fileContents => {
         let fileInfos = fileContents
             .map((content, i) => content ? createFileInfo(content, files[ i ]) : null)
@@ -199,7 +199,7 @@ function dealAllFilesMode(id: string, code: string, config: DocsifyDemoBoxAngula
         let extraFiles = getComponentUrlFiles(fileInfos);
 
         Promise.all(
-            extraFiles.map(file => $.get(file.trim()).catch(() => null))
+            extraFiles.map(file => ajaxGet(file.trim()).catch(() => null))
         ).then(extraFileContents => {
             let extraFileInfos = extraFileContents
                 .map((content, i) => content ? createFileInfo(content, extraFiles[ i ]) : null)

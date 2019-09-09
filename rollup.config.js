@@ -7,12 +7,6 @@ export default {
 
     input: './src/docsify-demo-box-angular.ts',
 
-    external: [ 'jquery' ],
-
-    globals: {
-        jquery: '$'
-    },
-
     output: {
         file: './dist/docsify-demo-box-angular.bundle.js',
         format: 'iife',

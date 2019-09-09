@@ -102,6 +102,29 @@ function createAppComponentTs() {
 
 /* 外部使用 */
 
+export function ajaxGet(url: string) {
+    return new Promise((resolve, reject) => {
+        let httpRequest = new XMLHttpRequest();
+
+        if (!httpRequest) {
+            throw Error('Cannot create an XMLHTTP instance');
+        }
+
+        httpRequest.onreadystatechange = function () {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    resolve(httpRequest.responseText);
+                } else {
+                    reject(httpRequest);
+                }
+            }
+        };
+
+        httpRequest.open('GET', url);
+        httpRequest.send();
+    });
+}
+
 export function parseClassName2FileName(className: string) {
     return className.replace(/([A-Z])/g, '-$1').toLowerCase().replace(/(^-)|(-$)/g, '');
 }
@@ -163,12 +186,12 @@ export function createAllFiles(fileInfos: FileInfo[]) {
     let basePath = /^(.+)index$/i.exec(index.fileName) && RegExp.$1 !== './' ? RegExp.$1 : null;
 
     return fileInfos.reduce((prev, file) => {
-        if (basePath && file.className.startsWith(basePath)) {
-            // code 中引用 index.html 目录外部的文件，修改相对路径 TODO
-
+        if (basePath && file.fileName.startsWith(basePath)) {
             prev[ file.fileName.replace(basePath, './') + file.ext ] = file.code;
         } else {
-            prev[ file.fileName + file.ext ] = file.code;
+            // tslint:disable-next-line:no-console
+            console.error(file.fileName + '：External files are not supported. '
+                + 'Move external files to the directory where index.html is located');
         }
 
         return prev;
