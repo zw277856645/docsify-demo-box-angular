@@ -24,7 +24,7 @@ window.$docsify = {
 DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
 [Stackblitz DOC](https://stackblitz.com/docs#generate-and-embed-new-projects)
 
-> 注意此处是全局配置，对所有 demo 解析产生影响，如果需要针对某个demo 解析配置参数，请参考示例章节的`局部配置`
+> 注意此处是全局配置，对所有 demo 解析产生影响，如果需要针对某个demo 解析配置参数，请参考`示例`章节的`局部配置`
 
 ```js
 {
@@ -55,7 +55,9 @@ DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
         hideExplorer?: boolean;       // 是否隐藏文件浏览器，关闭后只能看到 openFile 指定的文件。默认 true
         hideNavigation?: boolean;     // 是否隐藏导航栏。默认 true
         forceEmbedLayout?: boolean;   // 是否强制使用内嵌布局。默认 true
-    }
+    },
+    
+    extraModules?: { [ k: string ]: string }  // 其他依赖的模块，key 为模块类名，value 为 npm 包名，与 project.dependencies 配合使用
 }
 ```
 
@@ -85,23 +87,125 @@ DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
 
 ## 🎨 示例
 
+详情参见 [DEMO 示例](https://gitlab.com/zw277856645/docsify-demo-box-angular/raw/master/demo/demo.md)
+
 #### 1.源码模式
 
 ```js
 \`\`\`angular
+{
+  "project": {
+    "dependencies": {
+      "ngx-list-filter": "0.0.11"
+    }
+  },
+  "extraModules": {
+    "ListFilterModule": "ngx-list-filter"
+  }
+}
+
+/* DemoComponent */
+
 import { Component } from '@angular/core';
 
 @Component({
-    template: '<div>Hello {{ name }}</div>',
-    styles: []
+    template: \`
+        <h2>Hello，<span [innerHTML]="name | color:'red'"></span></h2>
+        <span *ngFor="let rec of list | listFilter:{age:{$gte:2}}">{{ rec.age }} </span>
+    \`
 })
-export class ExampleComponent {
-    name = 'man'
+export class DemoComponent {
+    name = 'xxx';
+    list = [{age:1}, {age:2}, {age:3}];
+}
+
+/* ColorPipe */
+
+import { Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+
+@Pipe({
+    name: 'color'
+})
+export class ColorPipe implements PipeTransform {
+
+    constructor(private sanitizer: DomSanitizer) {
+    }
+
+    transform(value: string, color: string) {
+        return this.sanitizer.bypassSecurityTrustHtml(\`<span style="color:${color}">${value}</span>\`);
+    }
 }
 \`\`\`
 ```
 
-解析到的组件会被设定为 DemoBoxAngular.create embedOptions 配置中的`openFile`。注意只能定义单个`@Component`，不支持`@Directive`、`@Pipe`
+注意要点：
+- `局部配置`必须放在开头，前面不能有任何文本(包括注释)。`局部配置`优先级高于`全局配置`。注意是 json 字符串，不是 javascript 对象，请严格使用双引号
+- 可以定义任意数量的`@Component`、`@Directive`、`@Pipe`，按从上到下顺序，`第一个 @Component 为路由出口组件`。只支持单路由，如果需要多出口路由，请使用「全量文件引入方式」
+- `第一个 @Component 组件`会被设置为配置 embedOptions.openFile
+- `@Component`的 html 模板和样式请使用内联方式 (template、styles)，不支持文件引入方式 (templateUrl、styleUrls)
 
+#### 2.部分文件引入模式
 
+```js
+\`\`\`angular-files
+{
+  "project": {
+    "dependencies": {
+      "ngx-list-filter": "0.0.11"
+    }
+  },
+  "extraModules": {
+    "ListFilterModule": "ngx-list-filter"
+  }
+}
 
+/* files path */
+
+files/util.ts
+files/main.component.ts
+files/style.component.ts
+\`\`\`
+```
+
+注意要点：
+- `局部配置`必须放在开头，前面不能有任何文本(包括注释)。`局部配置`优先级高于`全局配置`。注意是 json 字符串，不是 javascript 对象，请严格使用双引号
+- 所有使用到的文件都要被引入，除了`@Component`中的 templateUrl 和 styleUrls (会被自动引入)
+- 不能简写成引用目录下所有文件形式，比如：files/**。目录 (示例中的 files/) 是非必须的，但推荐使用目录隔离不同的 demo
+- 按从上到下顺序，`第一个 @Component 为路由出口组件`，比如上面示例中的第一个`@Component`文件为 main.component.ts。只支持单路由，如果需要多出口路由，请使用「全量文件引入方式」
+- `第一个 @Component 组件`会被设置为配置 embedOptions.openFile
+
+#### 3.全量文件引入方式
+
+```js
+\`\`\`angular-all-files
+{
+  "project": {
+    "dependencies": {
+      "ngx-list-filter": "0.0.11"
+    }
+  },
+  "embedOptions": {
+    "clickToLoad": true
+  }
+}
+
+all-files/app.component.ts                   // 提升目录为  app.component.ts
+all-files/app.module.ts                      // 提升目录为  app.module.ts 
+all-files/app-router.module.ts               // 提升目录为  app-router.module.ts
+all-files/main.ts                            // 提升目录为  main.ts
+all-files/polyfills.ts                       // 提升目录为  polyfills.ts
+all-files/index.html                         // 提升目录为  index.html
+all-files/main.component.ts                  // 提升目录为  main.component.ts
+all-files/external/style.component.ts        // 提升目录为  external/style.component.ts
+
+files/style.component.ts                     // 错误路径，打印日志并忽略
+\`\`\`
+```
+
+注意要点：
+- `局部配置`必须放在开头，前面不能有任何文本(包括注释)。`局部配置`优先级高于`全局配置`。注意是 json 字符串，不是 javascript 对象，请严格使用双引号
+- 所有使用到的文件都要被引入，除了`@Component`中的 templateUrl 和 styleUrls (会被自动引入)
+- 不能简写成引用目录下所有文件形式，比如：all-files/**。目录 (示例中的 all-files/) 是非必须的，但推荐使用目录隔离不同的 demo
+- 初始在代码窗口打开的文件 (embedOptions.openFile) 需要手动设定，默认为 main.ts
+- index.html、main.ts 需要放在根目录才能被 stackblitz 识别，所以当 index.html、main.ts 前面有额外路径时，其和其目录下的其他文件会被提升目录。不支持引用 index.html 所在目录外的文件，比如上面示例的 files/style.component.ts
