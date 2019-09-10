@@ -1,1 +1,1 @@
-<h2>I am a component</h2>
+<span *ngFor="let rec of list | listFilter:{age:{$gte:2}}">{{ rec.age }} </span>

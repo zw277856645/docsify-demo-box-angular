@@ -6,6 +6,9 @@
     "dependencies": {
       "ngx-list-filter": "0.0.11"
     }
+  },
+  "extraModules": {
+    "ListFilterModule": "ngx-list-filter"
   }
 }
 
@@ -16,11 +19,12 @@ import { Component } from '@angular/core';
 @Component({
     template: `
         <h2>Hello，<span [innerHTML]="name | color:'red'"></span></h2>
-        <div>[{age:1,age:2,age:3}] | listFilter:{age:{$gte:2}} | json</div>
+        <span *ngFor="let rec of list | listFilter:{age:{$gte:2}}">{{ rec.age }} </span>
     `
 })
 export class DemoComponent {
     name = 'xxx';
+    list = [{age:1}, {age:2}, {age:3}];
 }
 
 /* ColorPipe */
@@ -45,6 +49,17 @@ export class ColorPipe implements PipeTransform {
 ## 部分文件引入模式
 
 ``` angular-files
+{
+  "project": {
+    "dependencies": {
+      "ngx-list-filter": "0.0.11"
+    }
+  },
+  "extraModules": {
+    "ListFilterModule": "ngx-list-filter"
+  }
+}
+
 files/util.ts
 files/main.component.ts
 files/style.component.ts
@@ -53,6 +68,17 @@ files/style.component.ts
 ## 全量文件引入方式
 
 ``` angular-all-files
+{
+  "project": {
+    "dependencies": {
+      "ngx-list-filter": "0.0.11"
+    }
+  },
+  "embedOptions": {
+    "clickToLoad": true
+  }
+}
+
 all-files/app.component.ts
 all-files/app.module.ts
 all-files/app-router.module.ts

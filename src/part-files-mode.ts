@@ -1,15 +1,12 @@
 import {
     ajaxGet, createAppComponentTs, createAppRouterModuleTs, createFileInfo, createIndexHtml, createMainTs,
-    createPolyfills,
-    DEFAULT_DEPENDENCIES,
-    DEFAULT_EMBED_CONFIG,
-    FILE_MODE_REG, FileInfo,
-    FileType,
-    getComponentUrlFiles, parseConfig
+    createPolyfills, getComponentUrlFiles, parseConfig
 } from './util';
 import sdk from '@stackblitz/sdk';
 import { deepExtend } from 'cmjs-lib';
-import { DocsifyDemoBoxAngularConfig } from './docsify-demo-box-angular';
+import { DocsifyDemoBoxAngularConfig } from './config';
+import { DEFAULT_DEPENDENCIES, DEFAULT_EMBED_CONFIG, FILE_MODE_REG } from './constants';
+import { FileInfo, FileType } from './file-info';
 
 export function dealPartFilesMode(id: string, originCode: string, globalConfig: DocsifyDemoBoxAngularConfig) {
     let { config: innerConfig, code } = parseConfig(originCode);
@@ -46,11 +43,18 @@ export function dealPartFilesMode(id: string, originCode: string, globalConfig: 
                 .map((content, i) => content ? createFileInfo(content, extraFiles[ i ]) : null)
                 .filter(v => v);
 
+            // 需要在 module 导入的其他模块
+            let needImports = deepExtend(
+                {},
+                globalConfig && globalConfig.extraModules,
+                innerConfig && innerConfig.extraModules
+            );
+
             sdk.embedProject(
                 id,
                 deepExtend(
                     {
-                        files: createDefaultFiles(fileInfos.concat(extraFileInfos)),
+                        files: createDefaultFiles(fileInfos.concat(extraFileInfos), needImports),
                         template: 'angular-cli',
                         dependencies: DEFAULT_DEPENDENCIES,
                         settings: {
@@ -79,7 +83,9 @@ export function dealPartFilesMode(id: string, originCode: string, globalConfig: 
 
 // 辅助工具
 
-function createAppModuleTs(files: FileInfo[]) {
+function createAppModuleTs(files: FileInfo[], needImports: { [ k: string ]: string }) {
+    let modules = Object.keys(needImports).map(k => ({ name: k, package: needImports[ k ] }));
+
     return `
         import { NgModule } from '@angular/core';
         import { CommonModule } from '@angular/common';
@@ -87,14 +93,16 @@ function createAppModuleTs(files: FileInfo[]) {
         import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         import { AppRouterModule } from './app-router.module';
         import { AppComponent } from './app.component';
-        ${files.map(file => `import { ${file.className} } from '${file.fileName}';`).join('')}
+        ${modules.map(module => `import { ${module.name} } from '${module.package}';`).join('')}
+        ${files.map(file => `import { ${file.className} } from './${file.fileName}';`).join('')}
         
         @NgModule({
             imports: [
                 CommonModule,
                 BrowserModule,
                 BrowserAnimationsModule,
-                AppRouterModule
+                AppRouterModule,
+                ${modules.map(module => module.name).join(',')}
             ],
             declarations: [ 
                 AppComponent,
@@ -107,7 +115,7 @@ function createAppModuleTs(files: FileInfo[]) {
     `;
 }
 
-function createDefaultFiles(fileInfos: FileInfo[]) {
+function createDefaultFiles(fileInfos: FileInfo[], needImports: { [ k: string ]: string }) {
     if (!fileInfos || !fileInfos.length) {
         return {};
     }
@@ -126,10 +134,10 @@ function createDefaultFiles(fileInfos: FileInfo[]) {
         'polyfills.ts': createPolyfills(),
         'app.component.ts': createAppComponentTs(),
         'app-router.module.ts': createAppRouterModuleTs(mainComponent),
-        'app.module.ts': createAppModuleTs(needDeclareFiles)
+        'app.module.ts': createAppModuleTs(needDeclareFiles, needImports)
     };
 
-    fileInfos.forEach(file => files[ file.fileName.replace(/^\.\//, '') + file.ext ] = file.code);
+    fileInfos.forEach(file => files[ file.fileName + file.ext ] = file.code);
 
     return files;
 }

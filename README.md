@@ -47,10 +47,10 @@ DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
 
     // 代码预览器配置
     embedOptions?: {
-        openFile?: string;            // 初始在代码窗口打开的文件。默认为 markdown 中解析到的组件
+        openFile?: string;            // 初始在代码窗口打开的文件。默认为 main.ts
         clickToLoad?: boolean;        // 点击窗口后才开始加载。默认 false
         view?: 'preview' | 'editor';  // preview - 预览模式，editor - 代码模式。默认 preview
-        height?: number | string;     // 内嵌窗口高度。默认 400
+        height?: number | string;     // 内嵌窗口高度。默认 480
         width?: number | string;      // 内嵌窗口宽度。默认 100%
         hideExplorer?: boolean;       // 是否隐藏文件浏览器，关闭后只能看到 openFile 指定的文件。默认 true
         hideNavigation?: boolean;     // 是否隐藏导航栏。默认 true

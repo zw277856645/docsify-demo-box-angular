@@ -1,14 +1,7 @@
-import { EmbedOptions, Project } from '@stackblitz/sdk/typings/interfaces';
 import { dealSourceCodeMode } from './source-mode';
 import { dealPartFilesMode } from './part-files-mode';
 import { dealAllFilesMode } from './all-files-mode';
-
-export interface DocsifyDemoBoxAngularConfig {
-
-    project?: Partial<Project>;
-
-    embedOptions?: Partial<EmbedOptions>;
-}
+import { DocsifyDemoBoxAngularConfig } from './config';
 
 export function create(config?: DocsifyDemoBoxAngularConfig) {
     return function (hook: any) {

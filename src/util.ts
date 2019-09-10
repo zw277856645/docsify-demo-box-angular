@@ -1,3 +1,6 @@
+import { FileInfo, FileType } from './file-info';
+import { COMPONENT_CLASS_REG, DIRECTIVE_CLASS_REG, PIPE_CLASS_REG } from './constants';
+
 export function createIndexHtml() {
     return `
         <!DOCTYPE html>
@@ -52,7 +55,7 @@ export function createAppRouterModuleTs(mainFile: FileInfo) {
     return `
         import { RouterModule, Routes } from '@angular/router';
         import { NgModule } from '@angular/core';
-        import { ${mainFile.className} } from '${mainFile.fileName}';
+        import { ${mainFile.className} } from './${mainFile.fileName}';
         
         const routes: Routes = [
             {
@@ -93,61 +96,11 @@ export function ajaxGet(url: string) {
     });
 }
 
-export class FileInfo {
-
-    className?: string;
-
-    fileName: string;
-
-    type: FileType;
-
-    ext: string;
-
-    code: string;
-
-    mainComponent?: boolean;
-}
-
-export enum FileType {
-    COMPONENT = 'COMPONENT', DIRECTIVE = 'DIRECTIVE', PIPE = 'PIPE', OTHER = 'OTHER'
-}
-
-export const COMPONENT_CLASS_REG = /@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
-export const DIRECTIVE_CLASS_REG = /@Directive\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
-export const PIPE_CLASS_REG = /@Pipe\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
-
-export const FILE_MODE_REG = /^(?<!\/\/|\/\*|\/\*\*)\s*((\.\/)?[\w$][\w$-/.]+)/mg;
-
-export const DEFAULT_DEPENDENCIES = {
-    '@angular/animations': '^8.1.2',
-    '@angular/common': '^8.1.2',
-    '@angular/core': '^8.1.2',
-    '@angular/router': '^8.1.2',
-    '@angular/platform-browser': '^8.1.2',
-    '@angular/platform-browser-dynamic': '^8.1.2',
-    'rxjs': '^6.5.1',
-    'zone.js': '^0.9.1',
-    'core-js': '^2.5.7'
-};
-
-export const DEFAULT_EMBED_CONFIG = {
-    height: 400,
-    width: '100%',
-    view: 'preview',
-    hideExplorer: true,
-    hideNavigation: true,
-    forceEmbedLayout: true
-};
-
 export function createFileInfo(content: string, path: string) {
     let info = new FileInfo();
+    let filePath = path.trim().replace(/^\.\//, '');
+
     info.code = content;
-
-    let filePath = path.trim();
-    if (!filePath.startsWith('./')) {
-        filePath = './' + filePath;
-    }
-
     info.fileName = filePath.substring(0, filePath.lastIndexOf('.'));
     info.ext = filePath.substring(filePath.lastIndexOf('.'));
 
@@ -212,7 +165,7 @@ export function parseConfig(originCode: string): { config: any, code: string } {
             configStr += splits[ i ];
 
             try {
-                config = JSON.stringify(configStr);
+                config = JSON.parse(configStr);
                 splits.splice(0, i + 1);
                 code = splits.join('\n');
                 break;

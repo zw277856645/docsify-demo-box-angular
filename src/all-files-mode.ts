@@ -1,10 +1,9 @@
-import {
-    ajaxGet, createFileInfo, DEFAULT_DEPENDENCIES, DEFAULT_EMBED_CONFIG, FILE_MODE_REG, FileInfo,
-    getComponentUrlFiles, parseConfig
-} from './util';
+import { ajaxGet, createFileInfo, getComponentUrlFiles, parseConfig } from './util';
 import sdk from '@stackblitz/sdk';
 import { deepExtend } from 'cmjs-lib';
-import { DocsifyDemoBoxAngularConfig } from './docsify-demo-box-angular';
+import { DocsifyDemoBoxAngularConfig } from './config';
+import { DEFAULT_DEPENDENCIES, DEFAULT_EMBED_CONFIG, FILE_MODE_REG } from './constants';
+import { FileInfo } from './file-info';
 
 export function dealAllFilesMode(id: string, originCode: string, globalConfig: DocsifyDemoBoxAngularConfig) {
     let { config: innerConfig, code } = parseConfig(originCode);

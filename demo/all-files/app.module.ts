@@ -6,13 +6,15 @@ import { AppRouterModule } from './app-router.module';
 import { AppComponent } from './app.component';
 import { MainComponent } from './main.component';
 import { StyleComponent } from './external/style.component';
+import { ListFilterModule } from 'ngx-list-filter';
 
 @NgModule({
     imports: [
         CommonModule,
         BrowserModule,
         BrowserAnimationsModule,
-        AppRouterModule
+        AppRouterModule,
+        ListFilterModule
     ],
     declarations: [
         AppComponent,
