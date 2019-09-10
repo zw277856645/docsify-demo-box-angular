@@ -46,6 +46,8 @@ export class ColorPipe implements PipeTransform {
 }
 ```
 
+
+
 ## 部分文件引入模式
 
 ``` angular-files
@@ -64,6 +66,8 @@ files/util.ts
 files/main.component.ts
 files/style.component.ts
 ```
+
+
 
 ## 全量文件引入方式
 
