@@ -55,7 +55,7 @@ export function createAppRouterModuleTs(mainFile: FileInfo) {
     return `
         import { RouterModule, Routes } from '@angular/router';
         import { NgModule } from '@angular/core';
-        import { ${mainFile.className} } from './${mainFile.fileName}';
+        import { ${mainFile.className} } from './${mainFile.virtualFileName}';
         
         const routes: Routes = [
             {
@@ -91,9 +91,20 @@ export function ajaxGet(url: string) {
             }
         };
 
-        httpRequest.open('GET', url);
+        httpRequest.open('GET', parseFilePath(url).srcPath);
         httpRequest.send();
     });
+}
+
+export function parseFilePath(path: string): { srcPath: string; virtualPath: string } {
+    if (/(\[.*\])/.test(path)) {
+        return {
+            srcPath: path.replace(/[\[\]]/g, ''),
+            virtualPath: path.replace(/(\[.*?\])/g, '')
+        };
+    } else {
+        return { srcPath: path, virtualPath: path };
+    }
 }
 
 export function createFileInfo(content: string, path: string) {
@@ -103,6 +114,11 @@ export function createFileInfo(content: string, path: string) {
     info.code = content;
     info.fileName = filePath.substring(0, filePath.lastIndexOf('.'));
     info.ext = filePath.substring(filePath.lastIndexOf('.'));
+
+    let { srcPath, virtualPath } = parseFilePath(info.fileName);
+
+    info.fileName = srcPath;
+    info.virtualFileName = virtualPath;
 
     if (/^.ts$/i.test(info.ext)) {
         if (COMPONENT_CLASS_REG.exec(content)) {
@@ -122,37 +138,6 @@ export function createFileInfo(content: string, path: string) {
     }
 
     return info;
-}
-
-export function getComponentUrlFiles(fileInfos: FileInfo[]) {
-    return fileInfos.reduce((prev, fileInfo) => {
-        if (fileInfo.type === FileType.COMPONENT) {
-            let [ annotation ] = fileInfo.code.match(/@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)/g);
-            let files: string[] = [];
-
-            if (/templateUrl\s*:\s*['"](.+?)['"]/.exec(annotation)) {
-                files.push(RegExp.$1);
-            }
-
-            if (/styleUrls\s*:\s*\[((.|\n)+?)\]/.exec(annotation)) {
-                files.push(
-                    ...RegExp.$1.split(',').map(v => v.trim().replace(/(^['"])|(['"]$)/g, '')).filter(v => v)
-                );
-            }
-
-            if (files.length) {
-                if (fileInfo.fileName.includes('/')) {
-                    let basePath = fileInfo.fileName.substring(0, fileInfo.fileName.lastIndexOf('/') + 1);
-
-                    return prev.concat(files.map(file => basePath + file.replace(/^\.\//, '')));
-                } else {
-                    return prev.concat(files);
-                }
-            }
-        }
-
-        return prev;
-    }, []);
 }
 
 export function parseConfig(originCode: string): { config: any, code: string } {

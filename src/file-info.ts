@@ -4,6 +4,8 @@ export class FileInfo {
 
     fileName: string;
 
+    virtualFileName: string;
+
     type: FileType;
 
     ext: string;

@@ -24,6 +24,7 @@ export function dealSourceCodeMode(id: string, originCode: string, globalConfig:
         let fileInfo = new FileInfo();
         fileInfo.className = className;
         fileInfo.fileName = fileName;
+        fileInfo.virtualFileName = fileName;
         fileInfo.code = code;
         fileInfo.ext = '.ts';
         fileInfo.type = FileType.COMPONENT;
@@ -136,7 +137,7 @@ function createDefaultFile(fileInfo: FileInfo, needDeclares: string[], needImpor
         'polyfills.ts': createPolyfills(),
         'app.component.ts': createAppComponentTs(),
         'app-router.module.ts': createAppRouterModuleTs(fileInfo),
-        'app.module.ts': createAppModuleTs(needDeclares, fileInfo.fileName, needImports),
-        [ fileInfo.fileName + fileInfo.ext ]: fileInfo.code
+        'app.module.ts': createAppModuleTs(needDeclares, fileInfo.virtualFileName, needImports),
+        [ fileInfo.virtualFileName + fileInfo.ext ]: fileInfo.code
     };
 }

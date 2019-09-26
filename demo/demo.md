@@ -63,8 +63,14 @@ export class ColorPipe implements PipeTransform {
 }
 
 files/util.ts
+files/main.component.html
+files/main.component.css
 files/main.component.ts
+files/style.component.html
+files/style.component.css
 files/style.component.ts
+
+[files/]test.txt
 ```
 
 
@@ -83,13 +89,17 @@ files/style.component.ts
   }
 }
 
-all-files/app.component.ts
-all-files/app.module.ts
-all-files/app-router.module.ts
-all-files/main.ts
-all-files/polyfills.ts
-all-files/index.html
-all-files/main.component.ts
-all-files/external/style.component.ts
+[all-files/]app.component.ts
+[all-files/]app.module.ts
+[all-files/]app-router.module.ts
+[all-files/]main.ts
+[all-files/]polyfills.ts
+[all-files/]index.html
+[all-files/]main.component.html
+[all-files/]main.component.css
+[all-files/]main.component.ts
+[all-files/]external/style.component.html
+[all-files/]external/style.component.css
+[all-files/]external/style.component.ts
 ```
 

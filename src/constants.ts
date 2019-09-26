@@ -2,7 +2,7 @@ export const COMPONENT_CLASS_REG = /@Component\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*expo
 export const DIRECTIVE_CLASS_REG = /@Directive\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
 export const PIPE_CLASS_REG = /@Pipe\s*\(\s*\{(?:.|\n)+?\}\s*\)\s*export\s+class\s+(\w+)\s*/;
 
-export const FILE_MODE_REG = /^(?<!\/\/|\/\*|\/\*\*)\s*((\.\/)?[\w$][\w$-/.]+)/mg;
+export const FILE_MODE_REG = /^(?<!\/\/|\/\*|\/\*\*)\s*((\.\/|\[)?[\w$][\w$-/.\[\]]+)/mg;
 
 export const DEFAULT_DEPENDENCIES = {
     '@angular/animations': '^8.1.2',

@@ -163,17 +163,24 @@ export class ColorPipe implements PipeTransform {
 /* files path */
 
 files/util.ts
+files/main.component.html
+files/main.component.css
 files/main.component.ts
+files/style.component.html
+files/style.component.css
 files/style.component.ts
+
+[files/]test.txt
 \`\`\`
 ```
 
 注意要点：
 - `局部配置`必须放在开头，前面不能有任何文本(包括注释)。`局部配置`优先级高于`全局配置`。注意是 json 字符串，不是 javascript 对象，请严格使用双引号
-- 所有使用到的文件都要被引入，除了`@Component`中的 templateUrl 和 styleUrls (会被自动引入)
+- 所有使用到的文件都要被引入，包括`@Component`中的 templateUrl 和 styleUrls
 - 不能简写成引用目录下所有文件形式，比如：files/**。目录 (示例中的 files/) 是非必须的，但推荐使用目录隔离不同的 demo
 - 按从上到下顺序，`第一个 @Component 为路由出口组件`，比如上面示例中的第一个`@Component`文件为 main.component.ts。只支持单路由，如果需要多出口路由，请使用「全量文件引入方式」
 - `第一个 @Component 组件`会被设置为配置 embedOptions.openFile
+- 路径中使用`[]`包围的部分会被忽略，可使用此方式`提升`生成文件的路径，比如示例中 [files/]test.txt，在生成 stackblitz 项目文件时，files 目录会被去除。注意某一文件目录提升时，与之相关的其他文件需要一并提升目录   
 
 #### 3.全量文件引入方式
 
@@ -190,22 +197,24 @@ files/style.component.ts
   }
 }
 
-all-files/app.component.ts                   // 提升目录为  app.component.ts
-all-files/app.module.ts                      // 提升目录为  app.module.ts 
-all-files/app-router.module.ts               // 提升目录为  app-router.module.ts
-all-files/main.ts                            // 提升目录为  main.ts
-all-files/polyfills.ts                       // 提升目录为  polyfills.ts
-all-files/index.html                         // 提升目录为  index.html
-all-files/main.component.ts                  // 提升目录为  main.component.ts
-all-files/external/style.component.ts        // 提升目录为  external/style.component.ts
-
-files/style.component.ts                     // 错误路径，打印日志并忽略
+[all-files/]app.component.ts
+[all-files/]app.module.ts
+[all-files/]app-router.module.ts
+[all-files/]main.ts      (必须提供，且必须在根目录)                             
+[all-files/]index.html   (必须提供，且必须在根目录)
+[all-files/]polyfills.ts
+[all-files/]main.component.html
+[all-files/]main.component.css
+[all-files/]main.component.ts
+[all-files/]external/style.component.html
+[all-files/]external/style.component.css
+[all-files/]external/style.component.ts
 \`\`\`
 ```
 
 注意要点：
 - `局部配置`必须放在开头，前面不能有任何文本(包括注释)。`局部配置`优先级高于`全局配置`。注意是 json 字符串，不是 javascript 对象，请严格使用双引号
-- 所有使用到的文件都要被引入，除了`@Component`中的 templateUrl 和 styleUrls (会被自动引入)
+- 所有使用到的文件都要被引入，包括`@Component`中的 templateUrl 和 styleUrls
 - 不能简写成引用目录下所有文件形式，比如：all-files/**。目录 (示例中的 all-files/) 是非必须的，但推荐使用目录隔离不同的 demo
 - 初始在代码窗口打开的文件 (embedOptions.openFile) 需要手动设定，默认为 main.ts
-- index.html、main.ts 需要放在根目录才能被 stackblitz 识别，所以当 index.html、main.ts 前面有额外路径时，其和其目录下的其他文件会被提升目录。不支持引用 index.html 所在目录外的文件，比如上面示例的 files/style.component.ts
+- index.html、main.ts 需要放在根目录才能被 stackblitz 识别，所以当 index.html、main.ts 前面有额外路径时，需使用`[]`提升目录
