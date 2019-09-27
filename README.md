@@ -54,6 +54,7 @@ DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
         width?: number | string;      // 内嵌窗口宽度。默认 100%
         hideExplorer?: boolean;       // 是否隐藏文件浏览器，关闭后只能看到 openFile 指定的文件。默认 true
         hideNavigation?: boolean;     // 是否隐藏导航栏。默认 true
+        hideDevTools?: boolean;       // 是否隐藏 console 控制台
         forceEmbedLayout?: boolean;   // 是否强制使用内嵌布局。默认 true
     },
     
