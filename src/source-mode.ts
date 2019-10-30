@@ -2,7 +2,7 @@ import {
     createAppComponentTs, createAppRouterModuleTs, createIndexHtml, createMainTs, createPolyfills, parseConfig
 } from './util';
 import sdk from '@stackblitz/sdk';
-import { deepExtend } from 'cmjs-lib';
+import { deepExtend } from '@demacia/cmjs-lib';
 import { DocsifyDemoBoxAngularConfig } from './config';
 import {
     COMPONENT_CLASS_REG, DEFAULT_DEPENDENCIES, DEFAULT_EMBED_CONFIG, DIRECTIVE_CLASS_REG, PIPE_CLASS_REG

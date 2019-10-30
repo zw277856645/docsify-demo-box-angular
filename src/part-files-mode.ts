@@ -3,7 +3,7 @@ import {
     createPolyfills, parseConfig
 } from './util';
 import sdk from '@stackblitz/sdk';
-import { deepExtend } from 'cmjs-lib';
+import { deepExtend } from '@demacia/cmjs-lib';
 import { DocsifyDemoBoxAngularConfig } from './config';
 import { DEFAULT_DEPENDENCIES, DEFAULT_EMBED_CONFIG, FILE_MODE_REG } from './constants';
 import { FileInfo, FileType } from './file-info';

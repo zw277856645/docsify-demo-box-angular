@@ -1,6 +1,6 @@
 {
-  "name": "docsify-demo-box-angular",
-  "version": "0.1.0",
+  "name": "@demacia/docsify-demo-box-angular",
+  "version": "0.0.1",
   "main": "docsify-demo-box-angular.bundle.js",
   "description": "docsify run angular demo plugin",
   "repository": {

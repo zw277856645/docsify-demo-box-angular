@@ -97,11 +97,11 @@ DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
 {
   "project": {
     "dependencies": {
-      "ngx-list-filter": "0.0.11"
+      "@demacia/ngx-list-filter": "0.0.1"
     }
   },
   "extraModules": {
-    "ListFilterModule": "ngx-list-filter"
+    "ListFilterModule": "@demacia/ngx-list-filter"
   }
 }
 
@@ -153,11 +153,11 @@ export class ColorPipe implements PipeTransform {
 {
   "project": {
     "dependencies": {
-      "ngx-list-filter": "0.0.11"
+      "@demacia/ngx-list-filter": "0.0.1"
     }
   },
   "extraModules": {
-    "ListFilterModule": "ngx-list-filter"
+    "ListFilterModule": "@demacia/ngx-list-filter"
   }
 }
 
@@ -190,7 +190,7 @@ files/style.component.ts
 {
   "project": {
     "dependencies": {
-      "ngx-list-filter": "0.0.11"
+      "@demacia/ngx-list-filter": "0.0.1"
     }
   },
   "embedOptions": {
