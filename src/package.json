@@ -5,7 +5,7 @@
   "description": "docsify run angular demo plugin",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/zw277856645/docsify-demo-box-angular.git"
+    "url": "https://github.com/zw277856645/docsify-demo-box-angular.git"
   },
   "keywords": [
     "angular",

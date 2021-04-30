@@ -88,7 +88,7 @@ DemoBoxAngular.create 配置依赖 stackblitz sdk，各参数作用请参见
 
 ## 🎨 示例
 
-详情参见 [DEMO 示例](https://gitlab.com/zw277856645/docsify-demo-box-angular/raw/master/demo/demo.md)
+详情参见 [DEMO 示例](https://github.com/zw277856645/docsify-demo-box-angular/raw/master/demo/demo.md)
 
 #### 1.源码模式
 
